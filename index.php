@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -21,19 +22,20 @@
   <body>
     <div id="container"></div>
     <div id="error" style="display: none">
-      No game data found. Add ?g=base64data to URL
+      No game data found. Add ?x=xor-encoded-data to URL
     </div>
 
+    <script src="xor.js"></script>
     <script>
       try {
         // Extract game parameter from URL
         const params = new URLSearchParams(window.location.search);
-        const gameData = params.get('g');
+        const xorData = params.get('x');
 
-        if (gameData) {
-          // URL decode first, then base64 decode and inject into container
-          const decoded = atob(decodeURIComponent(gameData));
-          document.getElementById('container').innerHTML = decoded;
+        if (xorData) {
+          // URL decode first, then XOR decode and auto-detect content type
+          const decoded = window.xor.decode(decodeURIComponent(xorData));
+          window.xor.executeContent(decoded);
         } else {
           // Show error if no game data
           document.getElementById('error').style.display = 'block';
