@@ -1,0 +1,5 @@
+https://cdn.vincentbruijn.nl/qr/img.php?q=
+
+https://cdn.vincentbruijn.nl/qr/img.php?q=
+
+https://www.vincentbruijn.nl/qr3k/?g=PGgxPlFSM0sgVGVzdDwvaDE+PHA+SXQgd29ya3MhPC9wPjxjYW52YXMgaWQ9ImMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIj48L2NhbnZhcz48c2NyaXB0PmNvbnN0IGM9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2MnKS5nZXRDb250ZXh0KCcyZCcpO2MuZmlsbFN0eWxlPScjMGYwJztjLmZpbGxSZWN0KDEwLDEwLDE4MCw4MCk7Yy5maWxsU3R5bGU9JyMwMDAnO2MuZm9udD0nMjBweCBtb25vc3BhY2UnO2MuZmlsbFRleHQoJ0hlbGxvIFFSM0shJywyMCw1MCk8L3NjcmlwdD4=

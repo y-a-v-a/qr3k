@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>QR Game</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        color: #fff;
+        font-family: monospace;
+      }
+      #error {
+        padding: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="error" style="display: none">
+      No game data found. Add ?g=base64data to URL
+    </div>
+
+    <script>
+      try {
+        // Extract game parameter from URL
+        const params = new URLSearchParams(window.location.search);
+        const gameData = params.get('g');
+
+        if (gameData) {
+          // URL decode first, then base64 decode and inject into container
+          const decoded = atob(decodeURIComponent(gameData));
+          document.getElementById('container').innerHTML = decoded;
+        } else {
+          // Show error if no game data
+          document.getElementById('error').style.display = 'block';
+        }
+      } catch (e) {
+        // Handle decoding errors
+        document.getElementById('error').innerHTML =
+          'Invalid game data: ' + e.message;
+        document.getElementById('error').style.display = 'block';
+      }
+    </script>
+  </body>
+</html>
