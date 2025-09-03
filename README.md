@@ -4,7 +4,7 @@ A challenge to create complete games that fit entirely within a QR code's data c
 
 ## What is QR3K?
 
-QR3K (QR 3 Kilobytes) is a constraint-based game development challenge inspired by classic demoscene competitions and js1k contests. The goal: create a complete, playable game that fits entirely within a single QR code.
+QR3K (QR 3 Kilobytes) is a constraint-based game development challenge inspired by classic [demoscene](https://en.wikipedia.org/wiki/Demoscene) competitions, [the5k](https://the5k.org/) and [js1k](https://js1k.com/) contests. The goal: create a complete, playable game that fits entirely within a single QR code.
 
 ## The Constraint
 
