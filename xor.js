@@ -36,11 +36,18 @@ function executeContent(content) {
   if (isHtmlContent(content)) {
     // Inject as HTML
     const container = document.getElementById('container');
-    if (container) {
-      container.innerHTML = content;
-    } else {
-      document.body.innerHTML = content;
-    }
+    const target = container || document.body;
+    target.innerHTML = content;
+    
+    // Find and execute script tags (innerHTML doesn't execute them automatically)
+    const scripts = target.querySelectorAll('script');
+    scripts.forEach(script => {
+      try {
+        eval(script.textContent || script.innerText);
+      } catch (e) {
+        console.error('Script execution error:', e);
+      }
+    });
   } else {
     // Execute as JavaScript
     eval(content);

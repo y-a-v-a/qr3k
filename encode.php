@@ -67,12 +67,13 @@ ctx.fillStyle = '#0a0';
 ctx.fillRect(50, 50, 200, 100);
 ctx.fillText('Hello QR3K!', 80, 110);
 
-// HTML example:
+// HTML example (single script tag only):
 <canvas id='c' width='300' height='200'></canvas>
 <script>
 const ctx = document.getElementById('c').getContext('2d');
 ctx.fillStyle = '#0a0';
 ctx.fillRect(50, 50, 200, 100);
+ctx.fillText('Hello QR3K!', 80, 110);
 </script>"></textarea>
         <br>
         <button type="button" onclick="encodeGame()">XOR Encode & Generate QR URL</button>

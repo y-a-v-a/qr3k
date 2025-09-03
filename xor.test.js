@@ -111,4 +111,22 @@ test('should correctly detect HTML content', () => {
   assert.ok(!isHtmlContent('var canvas = document.createElement("canvas");'));
 });
 
+// Test HTML with script tag execution (Node.js environment simulation)
+test('should handle HTML content with script tags', () => {
+  const { encode, decode, isHtmlContent } = require('./xor.js');
+  
+  const htmlWithScript = '<div id="test">Hello</div><script>window.testExecuted = true;</script>';
+  
+  // Should detect as HTML
+  assert.ok(isHtmlContent(htmlWithScript));
+  
+  // Should encode and decode properly
+  const encoded = encode(htmlWithScript);
+  const decoded = decode(encoded);
+  assert.strictEqual(decoded, htmlWithScript);
+  
+  // Note: executeContent can't be fully tested in Node.js due to DOM requirements
+  // This test verifies the content is properly encoded/decoded for script execution
+});
+
 console.log('\nAll XOR tests passed! 🎉');

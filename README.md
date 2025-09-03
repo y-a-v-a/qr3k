@@ -57,10 +57,19 @@ For iOS Safari compatibility, QR3K uses XOR encryption with "qr3k" as the repeat
 
 ### Game Format
 
-Games should be complete HTML documents optimized for size:
+Games can be either pure JavaScript or HTML with a single script tag:
+
+```javascript
+// Pure JavaScript (auto-executed)
+const c = document.createElement('canvas');
+c.width = 300; c.height = 200;
+document.body.appendChild(c);
+// Ultra-minified game code...
+```
 
 ```html
-<canvas id="c"></canvas>
+<!-- HTML with single <script> tag (script auto-executed after DOM injection) -->
+<canvas id="c" width="300" height="200"></canvas>
 <script>
   // Ultra-minified game code
   // Use single-letter variables
@@ -68,6 +77,8 @@ Games should be complete HTML documents optimized for size:
   // Pack everything into ~2.9KB
 </script>
 ```
+
+**HTML Constraint**: When using HTML format, games must contain exactly one `<script>` tag. This keeps the system simple and optimized for the QR3K size limits.
 
 ## Development Tips
 
