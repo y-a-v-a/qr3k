@@ -1,0 +1,13 @@
+<!-- HTML Game Template - Starting point for HTML-format QR3K games -->
+<!-- Size: ~180 bytes | Encoded: ~240 bytes | Remaining: ~2713 bytes -->
+<canvas id="c" width="300" height="200" style="border:1px solid white"></canvas>
+<script>
+x=document.getElementById('c').getContext('2d');
+t=0;
+setInterval(_=>{
+x.fillStyle='#000';x.fillRect(0,0,300,200);
+x.fillStyle='#0f0';
+x.fillRect(Math.sin(t/50)*100+125,Math.cos(t/30)*50+75,50,50);
+t++
+},16)
+</script>

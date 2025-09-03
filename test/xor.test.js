@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { encode, decode } = require('./xor.js');
+const { encode, decode } = require('../src/runtime/xor.js');
 
 function test(description, fn) {
   try {
@@ -93,7 +93,7 @@ test('should cycle through XOR key correctly', () => {
 
 // Test HTML content detection
 test('should correctly detect HTML content', () => {
-  const { isHtmlContent } = require('./xor.js');
+  const { isHtmlContent } = require('../src/runtime/xor.js');
   
   // Should detect HTML
   assert.ok(isHtmlContent('<div>test</div>'));
@@ -113,7 +113,7 @@ test('should correctly detect HTML content', () => {
 
 // Test HTML with script tag execution (Node.js environment simulation)
 test('should handle HTML content with script tags', () => {
-  const { encode, decode, isHtmlContent } = require('./xor.js');
+  const { encode, decode, isHtmlContent } = require('../src/runtime/xor.js');
   
   const htmlWithScript = '<div id="test">Hello</div><script>window.testExecuted = true;</script>';
   

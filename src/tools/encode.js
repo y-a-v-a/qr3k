@@ -1,4 +1,4 @@
-const { encode } = require('./xor.js');
+const { encode } = require('../runtime/xor.js');
 
 // HTML game example
 const htmlGame = `<h1>QR3K Test</h1><p>It works!</p><canvas id="c" width="300" height="200"></canvas>

@@ -1,0 +1,33 @@
+{
+  "name": "qr3k",
+  "version": "1.0.0",
+  "description": "A challenge to create complete games that fit entirely within a QR code's data capacity",
+  "main": "src/runtime/index.php",
+  "scripts": {
+    "test": "node test/xor.test.js",
+    "encode": "node src/tools/encode.js",
+    "dev": "php -S localhost:8080 src/runtime/",
+    "build": "echo 'Copy src/runtime/* to deployment directory'"
+  },
+  "keywords": [
+    "qr-code",
+    "game-development",
+    "js1k",
+    "demoscene",
+    "constraint-programming",
+    "xor-encoding",
+    "canvas-games"
+  ],
+  "author": "Vincent Bruijn",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/qr3k.git"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "php": ">=7.4.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
