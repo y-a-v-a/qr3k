@@ -50,7 +50,7 @@
         h1 { color: #0f0; }
         .label { margin-top: 15px; margin-bottom: 5px; }
     </style>
-    <script src="../runtime/xor.js"></script>
+    <script src="xor.js"></script>
 </head>
 <body>
     <h1>QR3K XOR Encoder</h1>

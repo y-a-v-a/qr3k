@@ -6,8 +6,15 @@
   "scripts": {
     "test": "node test/xor.test.js",
     "encode": "node src/tools/encode.js",
-    "dev": "php -S localhost:8080 src/runtime/",
-    "build": "echo 'Copy src/runtime/* to deployment directory'"
+    "dev": "docker-compose up --build",
+    "dev:detached": "docker-compose up -d --build",
+    "stop": "docker-compose down",
+    "logs": "docker-compose logs -f qr3k",
+    "shell": "docker-compose exec qr3k /bin/bash",
+    "build": "docker build -t qr3k:latest .",
+    "build:prod": "docker build -t qr3k:production --target production .",
+    "deploy": "docker save qr3k:production | gzip > qr3k-production.tar.gz",
+    "clean": "docker-compose down --volumes --rmi all"
   },
   "keywords": [
     "qr-code",

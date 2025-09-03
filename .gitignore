@@ -47,5 +47,9 @@ coverage/
 tmp/
 temp/
 
+# Docker
+*.tar.gz
+qr3k-production.tar.gz
+
 # Claude settings (keep local settings private)
 .claude/settings.local.json
