@@ -1,0 +1,278 @@
+/* QR3K Brutalist Encoder Styles */
+/* Dark mode with vivid yellow, magenta, and blue accents */
+
+:root {
+    --bg-dark: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --yellow: #ffd700;
+    --magenta: #ff00ff;
+    --blue: #00d4ff;
+    --text-light: #f0f0f0;
+    --text-dark: #0a0a0a;
+    --shadow-offset: 6px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    padding: 40px 20px;
+    line-height: 1.6;
+}
+
+h1 {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--yellow);
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin-bottom: 10px;
+    background: var(--magenta);
+    color: var(--text-dark);
+    padding: 20px 30px;
+    display: inline-block;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--blue);
+    border: 4px solid var(--yellow);
+}
+
+p {
+    font-size: 16px;
+    margin: 30px 0;
+    max-width: 800px;
+    font-weight: 500;
+}
+
+.label {
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: var(--blue);
+}
+
+textarea {
+    width: 100%;
+    max-width: 900px;
+    height: 300px;
+    background: var(--bg-card);
+    color: var(--text-light);
+    border: 4px solid var(--yellow);
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    resize: vertical;
+    box-shadow: 8px 8px 0 var(--magenta);
+    transition: all 0.1s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 8px 8px 0 var(--yellow);
+}
+
+textarea::placeholder {
+    color: #666;
+}
+
+button {
+    background: var(--blue);
+    color: var(--text-dark);
+    border: 4px solid var(--text-dark);
+    padding: 18px 36px;
+    font-size: 16px;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 20px;
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--yellow);
+    transition: all 0.1s ease;
+    letter-spacing: 0.5px;
+}
+
+button:hover {
+    background: var(--yellow);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--magenta);
+    transform: translate(-2px, -2px);
+}
+
+button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--yellow);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.output {
+    margin-top: 30px;
+    padding: 25px;
+    background: var(--bg-card);
+    border: 4px solid var(--magenta);
+    max-width: 900px;
+    box-shadow: 8px 8px 0 var(--blue);
+}
+
+.qr-section {
+    margin-top: 30px;
+    padding: 25px;
+    background: var(--bg-card);
+    border: 4px solid var(--blue);
+    max-width: 900px;
+    box-shadow: 8px 8px 0 var(--yellow);
+    text-align: center;
+}
+
+.counter {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-light);
+    padding: 10px 15px;
+    background: var(--bg-card);
+    border: 3px solid #333;
+    display: inline-block;
+    max-width: 900px;
+}
+
+.counter.warning {
+    color: var(--text-dark);
+    background: var(--yellow);
+    border-color: var(--text-dark);
+    box-shadow: 4px 4px 0 var(--magenta);
+}
+
+.counter.error {
+    color: var(--text-light);
+    background: #ff0066;
+    border-color: var(--text-dark);
+    box-shadow: 4px 4px 0 var(--yellow);
+    font-weight: 900;
+}
+
+.success-message {
+    margin-top: 20px;
+    padding: 20px 25px;
+    background: var(--yellow);
+    border: 4px solid var(--text-dark);
+    color: var(--text-dark);
+    box-shadow: 6px 6px 0 var(--magenta);
+    display: none;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    max-width: 900px;
+}
+
+.copy-btn {
+    background: var(--magenta);
+    color: var(--text-light);
+    border: 3px solid var(--text-dark);
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 4px 4px 0 var(--yellow);
+    transition: all 0.1s ease;
+}
+
+.copy-btn:hover {
+    background: var(--yellow);
+    color: var(--text-dark);
+    box-shadow: 4px 4px 0 var(--blue);
+    transform: translate(-1px, -1px);
+}
+
+.copy-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--yellow);
+}
+
+.copy-btn.copied {
+    background: var(--blue);
+    color: var(--text-dark);
+    border-color: var(--text-dark);
+    box-shadow: 4px 4px 0 var(--magenta);
+}
+
+.url-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.url-text {
+    flex: 1;
+    min-width: 200px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 13px;
+    background: var(--bg-dark);
+    padding: 15px;
+    border: 3px solid var(--yellow);
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 3px solid var(--text-dark);
+    border-top-color: var(--yellow);
+    border-radius: 0;
+    animation: spin 0.8s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+#qrImage {
+    border: 6px solid var(--text-dark);
+    background: white;
+    padding: 15px;
+    box-shadow: 8px 8px 0 var(--magenta);
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 32px;
+        padding: 15px 20px;
+    }
+
+    textarea {
+        box-shadow: 5px 5px 0 var(--magenta);
+    }
+
+    button {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .url-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .copy-btn {
+        width: 100%;
+    }
+}

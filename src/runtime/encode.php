@@ -5,117 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>QR3K Encoder</title>
-    <style>
-        body {
-            font-family: monospace;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #000;
-            color: #0f0;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            background: #111;
-            color: #0f0;
-            border: 1px solid #333;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 14px;
-        }
-        button {
-            background: #333;
-            color: #0f0;
-            border: 1px solid #555;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-family: monospace;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #555;
-        }
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 15px;
-            background: #111;
-            border: 1px solid #333;
-            word-wrap: break-word;
-        }
-        .qr-section {
-            margin-top: 20px;
-            text-align: center;
-        }
-        h1 { color: #0f0; }
-        .label { margin-top: 15px; margin-bottom: 5px; }
-        .counter {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #888;
-        }
-        .counter.warning {
-            color: #ff0;
-        }
-        .counter.error {
-            color: #f00;
-        }
-        .success-message {
-            margin-top: 10px;
-            padding: 10px;
-            background: #1a3a1a;
-            border: 1px solid #0f0;
-            color: #0f0;
-            border-radius: 3px;
-            display: none;
-        }
-        .copy-btn {
-            background: #444;
-            color: #0f0;
-            border: 1px solid #666;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-family: monospace;
-            margin-left: 10px;
-            font-size: 12px;
-        }
-        .copy-btn:hover {
-            background: #666;
-        }
-        .copy-btn.copied {
-            background: #1a3a1a;
-            border-color: #0f0;
-        }
-        .url-container {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .url-text {
-            flex: 1;
-            min-width: 200px;
-            word-break: break-all;
-        }
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid #333;
-            border-top-color: #0f0;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
     <script src="xor.js"></script>
 </head>
 <body>
@@ -165,7 +55,7 @@ ctx.fillText('Hello QR3K!', 80, 110);
 
     <div id="qrPreview" class="qr-section" style="display: none;">
         <div class="label">QR Code Preview:</div>
-        <img id="qrImage" alt="QR Code" style="border: 2px solid #333; background: white; padding: 10px;">
+        <img id="qrImage" alt="QR Code">
     </div>
 
     <script>
