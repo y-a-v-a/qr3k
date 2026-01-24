@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php
+session_start();
+require_once __DIR__ . '/../encoding/php/Encoder.php';
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,8 +12,8 @@
     <script src="xor.js"></script>
 </head>
 <body>
-    <h1>QR3K XOR Encoder</h1>
-    <p>Paste your game code below (HTML or JavaScript) and generate a QR-compatible URL with XOR obfuscation for iOS Safari compatibility.</p>
+    <h1>QR3K Encoder</h1>
+    <p>Paste your game code below (HTML or JavaScript) and generate a QR-compatible URL. New: Gzip compression saves 33-45%!</p>
     
     <form id="encodeForm">
         <div class="label">Game Code (HTML or JavaScript):</div>
@@ -32,8 +35,25 @@ ctx.fillRect(50, 50, 200, 100);
 ctx.fillText('Hello QR3K!', 80, 110);
 </script>" oninput="updateCounter()"></textarea>
         <div id="charCounter" class="counter">0 bytes (0 bytes after base64) - Target: ~2,200 bytes (max 2,953 after encoding)</div>
+
+        <div class="label" style="margin-top: 1.5rem;">Encoding Method:</div>
+        <div class="method-selector">
+            <label class="method-option">
+                <input type="radio" name="method" value="gzip" checked>
+                <span>Gzip+XOR (Recommended) - 33-45% smaller</span>
+            </label>
+            <label class="method-option">
+                <input type="radio" name="method" value="xor">
+                <span>XOR Only (Legacy) - Backward compatible</span>
+            </label>
+            <label class="method-option">
+                <input type="radio" name="method" value="compare">
+                <span>Compare Both - Show size difference</span>
+            </label>
+        </div>
+
         <br>
-        <button type="button" id="encodeBtn" onclick="encodeGame()">XOR Encode & Generate QR URL</button>
+        <button type="button" id="encodeBtn" onclick="encodeGame()">Encode & Generate QR URL</button>
         <div id="successMessage" class="success-message">✓ Successfully encoded! QR code generated.</div>
     </form>
 
@@ -50,6 +70,35 @@ ctx.fillText('Hello QR3K!', 80, 110);
         <div class="url-container">
             <div id="qrUrl" class="url-text"></div>
             <button type="button" class="copy-btn" onclick="copyToClipboard('qrUrl', this)">Copy</button>
+        </div>
+    </div>
+
+    <div id="comparison" class="output" style="display: none;">
+        <div class="label">Size Comparison:</div>
+        <div class="comparison-table">
+            <div class="comparison-row">
+                <div class="comparison-label">Raw Code:</div>
+                <div class="comparison-value" id="rawSize"></div>
+            </div>
+            <div class="comparison-row">
+                <div class="comparison-label">XOR Only (Legacy):</div>
+                <div class="comparison-value" id="xorSize"></div>
+            </div>
+            <div class="comparison-row">
+                <div class="comparison-label">Gzip+XOR (New):</div>
+                <div class="comparison-value" id="gzipSize"></div>
+            </div>
+            <div class="comparison-row highlight">
+                <div class="comparison-label">Bytes Saved:</div>
+                <div class="comparison-value" id="bytesSaved"></div>
+            </div>
+            <div class="comparison-row highlight">
+                <div class="comparison-label">Compression Ratio:</div>
+                <div class="comparison-value" id="compressionRatio"></div>
+            </div>
+        </div>
+        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,215,0,0.1); border-left: 4px solid var(--yellow);">
+            <strong>💡 Tip:</strong> The gzip method allows you to build games that are <span id="percentLarger"></span> larger while still fitting in the QR code!
         </div>
     </div>
 
@@ -98,23 +147,15 @@ ctx.fillText('Hello QR3K!', 80, 110);
             });
         }
 
-        function encodeGame() {
+        async function encodeGame() {
             const code = document.getElementById('codeInput').value;
             const button = document.getElementById('encodeBtn');
             const successMsg = document.getElementById('successMessage');
+            const method = document.querySelector('input[name="method"]:checked').value;
 
             if (!code.trim()) {
                 alert('Please enter some game code');
                 return;
-            }
-
-            // Check size before encoding
-            const byteSize = new Blob([code]).size;
-            const base64Size = Math.ceil(byteSize * 4 / 3);
-            if (base64Size > 2953) {
-                if (!confirm(`Warning: Your code is ${base64Size - 2953} bytes over the QR code limit. The QR code may not work. Continue anyway?`)) {
-                    return;
-                }
             }
 
             try {
@@ -123,45 +164,82 @@ ctx.fillText('Hello QR3K!', 80, 110);
                 button.innerHTML = 'Encoding<span class="spinner"></span>';
                 successMsg.style.display = 'none';
 
-                // Small delay to show loading state
-                setTimeout(() => {
-                    try {
-                        // Use the imported xor.js encode function
-                        const encoded = window.xor.encode(code);
-                        const urlSafe = encodeURIComponent(encoded);
-                        const gameUrl = `https://www.vincentbruijn.nl/qr3k/?x=${urlSafe}`;
-                        const qrUrl = `https://cdn.vincentbruijn.nl/qr/img.php?q=${encodeURIComponent(gameUrl)}`;
+                // Hide previous results
+                document.getElementById('output').style.display = 'none';
+                document.getElementById('qrOutput').style.display = 'none';
+                document.getElementById('qrPreview').style.display = 'none';
+                document.getElementById('comparison').style.display = 'none';
 
-                        // Display results
-                        document.getElementById('gameUrl').textContent = gameUrl;
-                        document.getElementById('qrUrl').textContent = qrUrl;
-                        document.getElementById('qrImage').src = qrUrl;
+                // Call API
+                const response = await fetch('api.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code, method })
+                });
 
-                        // Show output sections
-                        document.getElementById('output').style.display = 'block';
-                        document.getElementById('qrOutput').style.display = 'block';
-                        document.getElementById('qrPreview').style.display = 'block';
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-                        // Show success message
-                        successMsg.style.display = 'block';
+                const result = await response.json();
 
-                        // Scroll to results
-                        document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (result.error) {
+                    throw new Error(result.error);
+                }
 
-                    } catch (error) {
-                        alert('Encoding error: ' + error.message);
-                    } finally {
-                        // Reset button state
-                        button.disabled = false;
-                        button.textContent = 'XOR Encode & Generate QR URL';
-                    }
-                }, 100);
+                // Display results based on method
+                if (method === 'compare') {
+                    // Show comparison table
+                    displayComparison(result);
+                    document.getElementById('comparison').style.display = 'block';
+
+                    // Show the gzip result as primary
+                    document.getElementById('gameUrl').textContent = result.gzip.gameUrl;
+                    document.getElementById('qrUrl').textContent = result.gzip.qrUrl;
+                    document.getElementById('qrImage').src = result.gzip.qrUrl;
+                } else {
+                    // Show single result
+                    document.getElementById('gameUrl').textContent = result.gameUrl;
+                    document.getElementById('qrUrl').textContent = result.qrUrl;
+                    document.getElementById('qrImage').src = result.qrUrl;
+                }
+
+                // Show output sections
+                document.getElementById('output').style.display = 'block';
+                document.getElementById('qrOutput').style.display = 'block';
+                document.getElementById('qrPreview').style.display = 'block';
+
+                // Show success message
+                successMsg.style.display = 'block';
+
+                // Scroll to results
+                document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
             } catch (error) {
                 alert('Encoding error: ' + error.message);
+            } finally {
+                // Reset button state
                 button.disabled = false;
-                button.textContent = 'XOR Encode & Generate QR URL';
+                button.textContent = 'Encode & Generate QR URL';
             }
+        }
+
+        function displayComparison(result) {
+            const rawSize = result.rawSize;
+            const xorSize = result.xor.size.totalBytes;
+            const gzipSize = result.gzip.size.totalBytes;
+            const saved = xorSize - gzipSize;
+            const ratio = result.gzip.size.compressionRatio;
+            const percentLarger = Math.round((1 / ratio - 1) * 100);
+
+            document.getElementById('rawSize').textContent = `${rawSize} bytes`;
+            document.getElementById('xorSize').textContent = `${xorSize} bytes (${result.xor.size.base64Bytes} base64)`;
+            document.getElementById('gzipSize').textContent = `${gzipSize} bytes (${result.gzip.size.base64Bytes} base64)`;
+            document.getElementById('bytesSaved').innerHTML = `<strong style="color: var(--yellow)">${saved} bytes (${Math.round((saved / xorSize) * 100)}%)</strong>`;
+            document.getElementById('compressionRatio').textContent = `${ratio.toFixed(2)}x smaller`;
+            document.getElementById('percentLarger').innerHTML = `<strong style="color: var(--yellow)">${percentLarger}%</strong>`;
         }
 
         // Initialize counter on page load

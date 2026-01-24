@@ -392,6 +392,97 @@ body.game-runtime {
     font-size: 14px;
 }
 
+/* Method selector styles */
+.method-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+    max-width: 900px;
+}
+
+.method-option {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-card);
+    border: 3px solid var(--yellow);
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.method-option:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: var(--blue);
+    box-shadow: 4px 4px 0 var(--magenta);
+}
+
+.method-option input[type="radio"] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--blue);
+}
+
+.method-option span {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Comparison table styles */
+.comparison-table {
+    margin-top: 15px;
+}
+
+.comparison-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 2px solid #333;
+    transition: background 0.1s ease;
+}
+
+.comparison-row:hover {
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.comparison-row:last-child {
+    border-bottom: none;
+}
+
+.comparison-row.highlight {
+    background: rgba(255, 215, 0, 0.1);
+    border: 3px solid var(--yellow);
+    border-left: 6px solid var(--yellow);
+    margin-top: 10px;
+    font-weight: 700;
+}
+
+.comparison-label {
+    font-weight: 700;
+    color: var(--blue);
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.comparison-value {
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.comparison-row.highlight .comparison-label {
+    color: var(--yellow);
+    font-size: 15px;
+}
+
+.comparison-row.highlight .comparison-value {
+    font-size: 16px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     h1 {
@@ -415,5 +506,19 @@ body.game-runtime {
 
     .copy-btn {
         width: 100%;
+    }
+
+    .comparison-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .method-selector {
+        gap: 10px;
+    }
+
+    .method-option {
+        padding: 12px 15px;
     }
 }

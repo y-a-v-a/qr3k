@@ -7,20 +7,34 @@
  *
  * Request format:
  * {
- *   "code": "game code here (HTML or JavaScript)"
+ *   "code": "game code here (HTML or JavaScript)",
+ *   "method": "gzip" | "xor" | "compare"  // Optional, defaults to "gzip"
  * }
  *
- * Response format:
+ * Response format (gzip method):
  * {
  *   "success": true,
- *   "gameUrl": "https://www.vincentbruijn.nl/qr3k/?x=...",
+ *   "gameUrl": "https://www.vincentbruijn.nl/qr3k/?z=...",
  *   "qrUrl": "https://cdn.vincentbruijn.nl/qr/img.php?q=...",
  *   "size": {
- *     "bytes": 1234,
- *     "base64Bytes": 1646
+ *     "raw": 1234,
+ *     "compressed": 750,
+ *     "base64": 1000,
+ *     "total": 1180,
+ *     "limit": 2953,
+ *     "isOverLimit": false,
+ *     "compressionRatio": "39.2%",
+ *     "savings": 484
+ *   },
+ *   "metadata": {
+ *     "method": "gzip+xor+base64",
+ *     "gzipLevel": 6
  *   }
  * }
  */
+
+// Include the encoder class
+require_once __DIR__ . '/../encoding/php/Encoder.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -43,34 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-/**
- * XOR encrypt text with "qr3k" key
- * Matches the JavaScript xorWithKey function in xor.js
- */
-function xorWithKey($text, $key) {
-    $result = '';
-    $keyLength = strlen($key);
-    $textLength = strlen($text);
-
-    for ($i = 0; $i < $textLength; $i++) {
-        $textChar = ord($text[$i]);
-        $keyChar = ord($key[$i % $keyLength]);
-        $result .= chr($textChar ^ $keyChar);
-    }
-
-    return $result;
-}
-
-/**
- * Encode game code using XOR and base64
- * Matches the JavaScript encode function in xor.js
- */
-function encodeGame($code) {
-    $xorKey = 'qr3k';
-    $xorEncrypted = xorWithKey($code, $xorKey);
-    return base64_encode($xorEncrypted);
-}
-
 // Read JSON input
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
@@ -86,6 +72,7 @@ if (!$data || !isset($data['code'])) {
 }
 
 $code = $data['code'];
+$method = $data['method'] ?? 'gzip'; // Default to gzip compression
 
 // Validate code is not empty
 if (empty(trim($code))) {
@@ -98,45 +85,65 @@ if (empty(trim($code))) {
 }
 
 try {
-    // Encode the game code
-    $encoded = encodeGame($code);
-    $urlSafe = urlencode($encoded);
+    $response = null;
 
-    // Generate URLs
-    $gameUrl = "https://www.vincentbruijn.nl/qr3k/?x={$urlSafe}";
-    $qrUrl = "https://cdn.vincentbruijn.nl/qr/img.php?q=" . urlencode($gameUrl);
+    switch ($method) {
+        case 'gzip':
+            // New gzip+xor+base64 encoding
+            $response = QR3KEncoder::encode($code);
+            break;
 
-    // Calculate sizes
-    $byteSize = strlen($code);
-    $base64Size = strlen($encoded);
+        case 'xor':
+            // Legacy xor+base64 encoding
+            $response = QR3KEncoder::encodeXOROnly($code);
+            break;
 
-    // Check if size exceeds QR code limit
-    $isOverLimit = $base64Size > 2953;
-    $warning = null;
+        case 'compare':
+            // Compare both methods - return full results for both
+            $gzipResult = QR3KEncoder::encode($code);
+            $xorResult = QR3KEncoder::encodeXOROnly($code);
 
-    if ($isOverLimit) {
-        $warning = "Code size ({$base64Size} bytes) exceeds QR code limit of 2,953 bytes by " .
-                   ($base64Size - 2953) . " bytes. QR code may not work.";
-    } elseif ($base64Size > 2200) {
-        $warning = "Code size ({$base64Size} bytes) is approaching the QR code limit. " .
-                   (2953 - $base64Size) . " bytes remaining.";
+            // Calculate compression ratio as a number
+            $compressionRatio = $gzipResult['size']['total'] / strlen($code);
+
+            $response = [
+                'success' => true,
+                'rawSize' => strlen($code),
+                'gzip' => [
+                    'gameUrl' => $gzipResult['gameUrl'],
+                    'qrUrl' => $gzipResult['qrUrl'],
+                    'size' => [
+                        'totalBytes' => $gzipResult['size']['total'],
+                        'base64Bytes' => $gzipResult['size']['base64'],
+                        'compressionRatio' => $compressionRatio
+                    ]
+                ],
+                'xor' => [
+                    'gameUrl' => $xorResult['gameUrl'],
+                    'qrUrl' => $xorResult['qrUrl'],
+                    'size' => [
+                        'totalBytes' => $xorResult['size']['base64'],
+                        'base64Bytes' => $xorResult['size']['base64']
+                    ]
+                ]
+            ];
+            break;
+
+        default:
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Invalid method. Use "gzip", "xor", or "compare".'
+            ]);
+            exit;
     }
 
-    // Success response
-    $response = [
-        'success' => true,
-        'gameUrl' => $gameUrl,
-        'qrUrl' => $qrUrl,
-        'size' => [
-            'bytes' => $byteSize,
-            'base64Bytes' => $base64Size,
-            'limit' => 2953,
-            'isOverLimit' => $isOverLimit
-        ]
-    ];
-
-    if ($warning) {
-        $response['warning'] = $warning;
+    // Add warning if over limit
+    if (isset($response['size']) && $response['size']['isOverLimit']) {
+        $overBy = abs($response['size']['remaining']);
+        $response['warning'] = "Code size ({$response['size']['total']} bytes) exceeds QR code limit by {$overBy} bytes. QR code may not work.";
+    } elseif (isset($response['size']) && $response['size']['total'] > 2200) {
+        $response['warning'] = "Code size ({$response['size']['total']} bytes) is approaching the QR code limit. {$response['size']['remaining']} bytes remaining.";
     }
 
     http_response_code(200);
