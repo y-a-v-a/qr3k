@@ -5,21 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>QR Game</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #000;
-        color: #fff;
-        font-family: monospace;
-      }
-      #error {
-        padding: 20px;
-        text-align: center;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
+  <body class="game-runtime">
     <div id="container"></div>
     <div id="error" style="display: none">
       No game data found. Add ?x=xor-encoded-data to URL
