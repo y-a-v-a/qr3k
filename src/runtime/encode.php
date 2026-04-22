@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once __DIR__ . '/../encoding/php/Encoder.php';
 ?>
 <!DOCTYPE html>
 <html>

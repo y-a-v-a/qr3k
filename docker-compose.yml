@@ -8,6 +8,8 @@ services:
     volumes:
       # Mount src/runtime for live development
       - ./src/runtime:/var/www/html
+      # Mount encoding library for API access
+      - ./src/encoding:/var/www/encoding
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data

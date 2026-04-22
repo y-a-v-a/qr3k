@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="game-runtime">
+    <a href="about.php" class="game-overlay">QR3K</a>
     <div id="container"></div>
     <div id="error" style="display: none">
       No game data found. Add ?z=gzip-encoded-data or ?x=xor-encoded-data to URL

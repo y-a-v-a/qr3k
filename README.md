@@ -230,3 +230,11 @@ https://www.vincentbruijn.nl/qr3k/?g=PGgxPlFSM0sgVGVzdDwvaDE+PHA+SXQgd29ya3MhPC9
 #### Pong Game QR Code
 
 ![Pong QR3K Game](pong.qr.png)
+
+#### License
+
+MIT
+
+#### Copyright
+
+Vincent Bruijn <vebruijn@gmail.com> 2025
