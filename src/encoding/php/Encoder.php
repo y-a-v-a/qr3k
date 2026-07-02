@@ -6,14 +6,19 @@
 
 class QR3KEncoder {
     const XOR_KEY = 'qr3k';
+    // Max capacity of a QR code (version 40, binary mode, error correction L).
+    // The QR code contains the FULL game URL, so that is what we measure.
     const QR_LIMIT = 2953;
-    const DECODER_SIZE = 180; // Approximate minified decoder size
+    const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
+    const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
 
     /**
-     * Apply XOR cipher with repeating key
-     * @param string $data - Data to encrypt/decrypt
-     * @param string $key - Encryption key (defaults to "qr3k")
-     * @return string XOR-encrypted data
+     * Apply XOR cipher with repeating key.
+     * This is obfuscation, not encryption — the key is public. It exists to
+     * keep game code from being pattern-matched by iOS Safari's filtering.
+     * @param string $data - Data to obfuscate/deobfuscate
+     * @param string $key - Key (defaults to "qr3k")
+     * @return string XOR-obfuscated data
      */
     public static function xorWithKey($data, $key = self::XOR_KEY) {
         $result = '';
@@ -32,6 +37,7 @@ class QR3KEncoder {
      * @param string $code - Game code (HTML or JavaScript)
      * @param array $options - Encoding options
      * @return array Encoding result with URLs and size info
+     * @throws RuntimeException if compression fails
      */
     public static function encode($code, $options = []) {
         $level = $options['level'] ?? 6; // Compression level (1-9)
@@ -39,13 +45,10 @@ class QR3KEncoder {
         // Step 1: Gzip compress
         $compressed = gzencode($code, $level);
         if ($compressed === false) {
-            return [
-                'success' => false,
-                'error' => 'Gzip compression failed'
-            ];
+            throw new RuntimeException('Gzip compression failed');
         }
 
-        // Step 2: XOR encrypt
+        // Step 2: XOR obfuscate
         $encrypted = self::xorWithKey($compressed);
 
         // Step 3: Base64 encode
@@ -54,22 +57,21 @@ class QR3KEncoder {
         // Step 4: URL encode for QR
         $urlSafe = urlencode($encoded);
 
-        // Calculate sizes
+        // Generate URLs
+        $gameUrl = self::RUNTIME_URL . "?z={$urlSafe}";
+        $qrUrl = self::QR_IMAGE_URL . urlencode($gameUrl);
+
+        // Calculate sizes. The QR code encodes the full game URL, so the
+        // size that matters is strlen($gameUrl) — not the base64 payload.
         $rawSize = strlen($code);
         $compressedSize = strlen($compressed);
-        $encryptedSize = strlen($encrypted); // Same as compressed
         $encodedSize = strlen($encoded);
-        $urlSize = strlen($urlSafe);
-        $totalSize = $encodedSize + self::DECODER_SIZE;
-
-        // Check limits
+        $totalSize = strlen($gameUrl);
         $isOverLimit = $totalSize > self::QR_LIMIT;
 
-        // Generate URLs
-        $gameUrl = "https://www.vincentbruijn.nl/qr3k/?z={$urlSafe}";
-        $qrUrl = "https://cdn.vincentbruijn.nl/qr/img.php?q=" . urlencode($gameUrl);
-
-        $compressionRatio = round((1 - $compressedSize / $rawSize) * 100, 1);
+        $compressionRatio = $rawSize > 0
+            ? round((1 - $compressedSize / $rawSize) * 100, 1)
+            : 0;
 
         return [
             'success' => true,
@@ -79,10 +81,8 @@ class QR3KEncoder {
             'size' => [
                 'raw' => $rawSize,
                 'compressed' => $compressedSize,
-                'encrypted' => $encryptedSize,
                 'base64' => $encodedSize,
-                'url' => $urlSize,
-                'decoder' => self::DECODER_SIZE,
+                'url' => strlen($urlSafe),
                 'total' => $totalSize,
                 'limit' => self::QR_LIMIT,
                 'isOverLimit' => $isOverLimit,
@@ -109,11 +109,12 @@ class QR3KEncoder {
         $encoded = base64_encode($encrypted);
         $urlSafe = urlencode($encoded);
 
+        $gameUrl = self::RUNTIME_URL . "?x={$urlSafe}";
+        $qrUrl = self::QR_IMAGE_URL . urlencode($gameUrl);
+
         $rawSize = strlen($code);
         $encodedSize = strlen($encoded);
-
-        $gameUrl = "https://www.vincentbruijn.nl/qr3k/?x={$urlSafe}";
-        $qrUrl = "https://cdn.vincentbruijn.nl/qr/img.php?q=" . urlencode($gameUrl);
+        $totalSize = strlen($gameUrl);
 
         return [
             'success' => true,
@@ -123,9 +124,11 @@ class QR3KEncoder {
             'size' => [
                 'raw' => $rawSize,
                 'base64' => $encodedSize,
+                'url' => strlen($urlSafe),
+                'total' => $totalSize,
                 'limit' => self::QR_LIMIT,
-                'isOverLimit' => $encodedSize > self::QR_LIMIT,
-                'remaining' => self::QR_LIMIT - $encodedSize
+                'isOverLimit' => $totalSize > self::QR_LIMIT,
+                'remaining' => self::QR_LIMIT - $totalSize
             ],
             'metadata' => [
                 'method' => 'xor+base64',
@@ -145,9 +148,9 @@ class QR3KEncoder {
 
         $rawSize = strlen($code);
         $gzipTotal = $gzipResult['size']['total'];
-        $xorTotal = $xorResult['size']['base64'];
+        $xorTotal = $xorResult['size']['total'];
         $savings = $xorTotal - $gzipTotal;
-        $improvement = round(($savings / $xorTotal) * 100, 1);
+        $improvement = $xorTotal > 0 ? round(($savings / $xorTotal) * 100, 1) : 0;
 
         return [
             'raw' => $rawSize,

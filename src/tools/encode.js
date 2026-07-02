@@ -1,4 +1,11 @@
-const { encode } = require('../runtime/xor.js');
+/**
+ * QR3K encoding demo tool
+ * Usage: node src/tools/encode.js [path-to-game-file]
+ * Without arguments it encodes two small example games.
+ */
+
+const fs = require('fs');
+const { encode, encodeXOROnly } = require('../encoding/node/encoder');
 
 // HTML game example
 const htmlGame = `<h1>QR3K Test</h1><p>It works!</p><canvas id="c" width="300" height="200"></canvas>
@@ -11,7 +18,7 @@ c.font = '20px monospace';
 c.fillText('HTML QR3K Game!', 20, 110);
 </script>`;
 
-// JavaScript game example  
+// JavaScript game example
 const jsGame = `
 const h = document.createElement('h1');
 h.textContent = 'QR3K JS Test';
@@ -31,19 +38,27 @@ ctx.font = '24px monospace';
 ctx.fillText('JS QR3K Game!', 60, 110);
 `;
 
-// XOR encode both examples
-const htmlEncoded = encode(htmlGame);
-const jsEncoded = encode(jsGame);
+async function report(label, code) {
+  const gzip = await encode(code);
+  const xor = encodeXOROnly(code);
 
-const htmlURL = `https://www.vincentbruijn.nl/qr3k/?x=${encodeURIComponent(htmlEncoded)}`;
-const jsURL = `https://www.vincentbruijn.nl/qr3k/?x=${encodeURIComponent(jsEncoded)}`;
+  console.log(`${label}:`);
+  console.log(`  Gzip URL (${gzip.size.total}/${gzip.size.limit} bytes): ${gzip.qrUrl}`);
+  console.log(`  XOR URL  (${xor.size.total}/${xor.size.limit} bytes): ${xor.qrUrl}`);
+  if (gzip.size.isOverLimit) {
+    console.log(`  ⚠️  Over the QR limit by ${-gzip.size.remaining} bytes`);
+  }
+  console.log('');
+}
 
-const htmlQrUrl = `https://cdn.vincentbruijn.nl/qr/img.php?q=${encodeURIComponent(htmlURL)}`;
-const jsQrUrl = `https://cdn.vincentbruijn.nl/qr/img.php?q=${encodeURIComponent(jsURL)}`;
+(async function main() {
+  const file = process.argv[2];
+  if (file) {
+    const code = fs.readFileSync(file, 'utf8');
+    await report(file, code);
+    return;
+  }
 
-console.log('HTML Game (auto-detected as HTML, injected into DOM):');
-console.log(htmlQrUrl);
-console.log('');
-console.log('JavaScript Game (auto-detected as JS, executed directly):');
-console.log(jsQrUrl);
-console.log('');
+  await report('HTML Game (auto-detected as HTML, injected into DOM)', htmlGame);
+  await report('JavaScript Game (auto-detected as JS, executed directly)', jsGame);
+})();

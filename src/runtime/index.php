@@ -1,4 +1,21 @@
-<?php session_start(); ?>
+<?php
+session_start();
+
+// Content-Security-Policy for the runtime page. The sandboxed srcdoc iframe
+// inherits this policy, so games keep canvas/keyboard/touch but cannot
+// exfiltrate data (connect-src 'none') or load remote scripts.
+header(
+    "Content-Security-Policy: " .
+    "default-src 'none'; " .
+    "script-src 'self' 'unsafe-inline'; " .
+    "style-src 'self' 'unsafe-inline'; " .
+    "img-src 'self' data: blob:; " .
+    "media-src data: blob:; " .
+    "connect-src 'none'; " .
+    "base-uri 'none'; " .
+    "form-action 'none'"
+);
+?>
 <!DOCTYPE html>
 <html>
   <head>
@@ -16,55 +33,76 @@
 
     <script>
       (async function() {
+        function showError(message) {
+          const el = document.getElementById('error');
+          el.textContent = message;
+          el.style.display = 'block';
+        }
+
+        function isHtmlContent(content) {
+          const trimmed = content.trim();
+          return trimmed.startsWith('<') ||
+            /<!DOCTYPE|<html|<head|<body|<script|<style|<div|<canvas/i.test(trimmed);
+        }
+
+        // Run the decoded game inside a sandboxed iframe: no same-origin
+        // access, opaque origin, and it inherits this page's CSP. The game
+        // can only play inside its own 3KB box.
+        function runGame(code) {
+          let html;
+          if (isHtmlContent(code)) {
+            html = code;
+          } else {
+            const safe = code.replace(/<\/script/gi, '<\\/script');
+            html = '<body style="margin:0;background:#000;color:#fff">' +
+              '<script>' + safe + '<\/script></body>';
+          }
+          const frame = document.createElement('iframe');
+          frame.setAttribute('sandbox', 'allow-scripts');
+          frame.className = 'game-frame';
+          frame.style.cssText = 'border:0;width:100vw;height:100vh;display:block';
+          frame.srcdoc = html;
+          document.getElementById('container').appendChild(frame);
+        }
+
         try {
-          // Extract game parameter from URL
           const params = new URLSearchParams(window.location.search);
-          const gzipData = params.get('z'); // New: Gzip+XOR+Base64
+          const gzipData = params.get('z'); // Gzip+XOR+Base64
           const xorData = params.get('x');  // Legacy: XOR+Base64
 
           if (gzipData) {
-            // Decode gzip+xor+base64 (new method)
-            // Inline decoder to avoid extra HTTP request
-            const base64Decoded = atob(decodeURIComponent(gzipData));
+            // Decode gzip+xor+base64 (inline decoder, no extra HTTP request)
+            const base64Decoded = atob(gzipData);
             const key = 'qr3k';
-            let xorDecrypted = '';
+            const bytes = new Uint8Array(base64Decoded.length);
             for (let i = 0; i < base64Decoded.length; i++) {
-              xorDecrypted += String.fromCharCode(
-                base64Decoded.charCodeAt(i) ^ key.charCodeAt(i % 4)
-              );
-            }
-            const bytes = new Uint8Array(xorDecrypted.length);
-            for (let i = 0; i < xorDecrypted.length; i++) {
-              bytes[i] = xorDecrypted.charCodeAt(i);
+              bytes[i] = base64Decoded.charCodeAt(i) ^ key.charCodeAt(i % 4);
             }
             const stream = new Blob([bytes]).stream();
             const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
-            const response = new Response(decompressedStream);
-            const code = await response.text();
-
-            // Execute decoded code
-            eval(code);
+            const code = await new Response(decompressedStream).text();
+            runGame(code);
 
           } else if (xorData) {
             // Legacy XOR-only decoding - load xor.js
             const script = document.createElement('script');
             script.src = 'xor.js';
             script.onload = function() {
-              const decoded = window.xor.decode(decodeURIComponent(xorData));
-              window.xor.executeContent(decoded);
+              try {
+                runGame(window.xor.decode(xorData));
+              } catch (e) {
+                console.error('Decode error:', e);
+                showError('Invalid game data: ' + e.message);
+              }
             };
             document.head.appendChild(script);
 
           } else {
-            // Show error if no game data
-            document.getElementById('error').style.display = 'block';
+            showError('No game data found. Add ?z=gzip-encoded-data or ?x=xor-encoded-data to URL');
           }
         } catch (e) {
-          // Handle decoding errors
           console.error('Decode error:', e);
-          document.getElementById('error').innerHTML =
-            'Invalid game data: ' + e.message;
-          document.getElementById('error').style.display = 'block';
+          showError('Invalid game data: ' + e.message);
         }
       })();
     </script>

@@ -6,10 +6,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable PHP session support and required extensions  
-RUN docker-php-ext-install session
-
-# Enable Apache modules
+# Enable Apache modules (sessions and zlib are built into the official PHP image)
 RUN a2enmod rewrite headers expires
 
 # Configure Apache

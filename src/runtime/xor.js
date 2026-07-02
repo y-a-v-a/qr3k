@@ -1,5 +1,6 @@
-// XOR encryption/decryption using "qr3k" as the repeating key
-// Designed to obfuscate JavaScript code for iOS Safari compatibility
+// XOR obfuscation (NOT encryption — the 4-byte key is public) using "qr3k"
+// as the repeating key. Its only job is to keep game code from being
+// pattern-matched by iOS Safari's content filtering.
 
 const XOR_KEY = "qr3k";
 
@@ -32,31 +33,12 @@ function isHtmlContent(content) {
          /<!DOCTYPE|<html|<head|<body|<script|<style|<div|<canvas/i.test(trimmed);
 }
 
-function executeContent(content) {
-  if (isHtmlContent(content)) {
-    // Inject as HTML
-    const container = document.getElementById('container');
-    const target = container || document.body;
-    target.innerHTML = content;
-    
-    // Find and execute script tags (innerHTML doesn't execute them automatically)
-    const scripts = target.querySelectorAll('script');
-    scripts.forEach(script => {
-      try {
-        eval(script.textContent || script.innerText);
-      } catch (e) {
-        console.error('Script execution error:', e);
-      }
-    });
-  } else {
-    // Execute as JavaScript
-    eval(content);
-  }
-}
+// Note: game execution lives in index.php (sandboxed iframe), not here.
+// This file only provides the encode/decode primitives.
 
 // Export for Node.js if available, otherwise attach to window
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { encode, decode, isHtmlContent, executeContent };
+  module.exports = { encode, decode, isHtmlContent };
 } else if (typeof window !== 'undefined') {
-  window.xor = { encode, decode, isHtmlContent, executeContent };
+  window.xor = { encode, decode, isHtmlContent };
 }

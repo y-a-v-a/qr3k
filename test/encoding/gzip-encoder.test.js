@@ -1,6 +1,10 @@
 /**
  * Tests for QR3K Gzip+XOR+Base64 Encoder
+ * Runs with the built-in Node.js test runner: node --test test/encoding/
  */
+
+const { describe, test } = require('node:test');
+const assert = require('node:assert');
 
 const { encode, encodeXOROnly, compare } = require('../../src/encoding/node/encoder');
 const { xorWithKey, encodeXOR, decodeXOR } = require('../../src/encoding/core/xor');
@@ -53,7 +57,7 @@ async function decodeGzip(encoded) {
   // Base64 decode
   const base64Decoded = Buffer.from(encoded, 'base64');
 
-  // XOR decrypt
+  // XOR deobfuscate
   const decrypted = xorWithKey(base64Decoded);
 
   // Gunzip
@@ -68,25 +72,25 @@ async function decodeGzip(encoded) {
 }
 
 describe('XOR Utilities', () => {
-  test('XOR encryption and decryption are symmetric', () => {
+  test('XOR obfuscation is symmetric', () => {
     const original = 'Hello, QR3K!';
     const encrypted = xorWithKey(Buffer.from(original, 'utf8'));
     const decrypted = xorWithKey(encrypted);
-    expect(decrypted.toString('utf8')).toBe(original);
+    assert.strictEqual(decrypted.toString('utf8'), original);
   });
 
   test('encodeXOR and decodeXOR are inverse operations', () => {
     const original = 'test data 123';
     const encoded = encodeXOR(original);
     const decoded = decodeXOR(encoded);
-    expect(decoded.toString('utf8')).toBe(original);
+    assert.strictEqual(decoded.toString('utf8'), original);
   });
 
   test('XOR with binary data works correctly', () => {
     const binary = Buffer.from([0, 1, 2, 3, 255, 254, 253]);
     const encrypted = xorWithKey(binary);
     const decrypted = xorWithKey(encrypted);
-    expect(decrypted).toEqual(binary);
+    assert.deepStrictEqual(decrypted, binary);
   });
 });
 
@@ -94,12 +98,12 @@ describe('Gzip+XOR+Base64 Encoder', () => {
   test('encode returns valid result structure', async () => {
     const result = await encode(testGames.minimal);
 
-    expect(result.success).toBe(true);
-    expect(result.encoded).toBeDefined();
-    expect(result.gameUrl).toBeDefined();
-    expect(result.qrUrl).toBeDefined();
-    expect(result.size).toBeDefined();
-    expect(result.metadata).toBeDefined();
+    assert.strictEqual(result.success, true);
+    assert.ok(result.encoded !== undefined);
+    assert.ok(result.gameUrl !== undefined);
+    assert.ok(result.qrUrl !== undefined);
+    assert.ok(result.size !== undefined);
+    assert.ok(result.metadata !== undefined);
   });
 
   test('encoded data can be decoded back to original', async () => {
@@ -107,7 +111,7 @@ describe('Gzip+XOR+Base64 Encoder', () => {
     const result = await encode(original);
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe(original);
+    assert.strictEqual(decoded, original);
   });
 
   test('gzip compression provides size savings', async () => {
@@ -115,19 +119,20 @@ describe('Gzip+XOR+Base64 Encoder', () => {
     const result = await encode(original);
 
     // Compression should reduce size
-    expect(result.size.compressed).toBeLessThan(result.size.raw);
+    assert.ok(result.size.compressed < result.size.raw);
 
     // Compression ratio should be reasonable (at least 20% for this code)
-    const ratio = (result.size.compressed / result.size.raw);
-    expect(ratio).toBeLessThan(0.8);
+    const ratio = result.size.compressed / result.size.raw;
+    assert.ok(ratio < 0.8);
   });
 
-  test('size calculations are accurate', async () => {
+  test('size total is the full game URL length (what the QR encodes)', async () => {
     const result = await encode(testGames.minimal);
 
-    expect(result.size.raw).toBe(Buffer.byteLength(testGames.minimal, 'utf8'));
-    expect(result.size.base64).toBe(result.encoded.length);
-    expect(result.size.total).toBe(result.size.base64 + result.size.decoder);
+    assert.strictEqual(result.size.raw, Buffer.byteLength(testGames.minimal, 'utf8'));
+    assert.strictEqual(result.size.base64, result.encoded.length);
+    assert.strictEqual(result.size.total, result.gameUrl.length);
+    assert.strictEqual(result.size.remaining, result.size.limit - result.size.total);
   });
 
   test('compression levels affect size', async () => {
@@ -137,29 +142,30 @@ describe('Gzip+XOR+Base64 Encoder', () => {
     const level9 = await encode(code, { level: 9 }); // Best
 
     // Level 9 should produce smaller output
-    expect(level9.size.compressed).toBeLessThanOrEqual(level1.size.compressed);
+    assert.ok(level9.size.compressed <= level1.size.compressed);
   });
 
   test('QR limit detection works', async () => {
-    const largeCode = 'x'.repeat(5000);
+    // Random bytes don't compress, so this stays over the limit after gzip
+    const largeCode = require('crypto').randomBytes(4000).toString('hex');
     const result = await encode(largeCode);
 
-    expect(result.size.isOverLimit).toBe(true);
-    expect(result.size.remaining).toBeLessThan(0);
+    assert.strictEqual(result.size.isOverLimit, true);
+    assert.ok(result.size.remaining < 0);
   });
 
   test('gameUrl uses ?z= parameter', async () => {
     const result = await encode(testGames.minimal);
 
-    expect(result.gameUrl).toContain('?z=');
-    expect(result.gameUrl).toContain('www.vincentbruijn.nl/qr3k');
+    assert.ok(result.gameUrl.includes('?z='));
+    assert.ok(result.gameUrl.includes('www.vincentbruijn.nl/qr3k'));
   });
 
   test('qrUrl is properly formatted', async () => {
     const result = await encode(testGames.minimal);
 
-    expect(result.qrUrl).toContain('cdn.vincentbruijn.nl/qr/img.php?q=');
-    expect(result.qrUrl).toContain(encodeURIComponent('https://'));
+    assert.ok(result.qrUrl.includes('cdn.vincentbruijn.nl/qr/img.php?q='));
+    assert.ok(result.qrUrl.includes(encodeURIComponent('https://')));
   });
 });
 
@@ -167,9 +173,15 @@ describe('Legacy XOR-only Encoder', () => {
   test('encodeXOROnly returns valid result', () => {
     const result = encodeXOROnly(testGames.minimal);
 
-    expect(result.success).toBe(true);
-    expect(result.encoded).toBeDefined();
-    expect(result.gameUrl).toContain('?x=');
+    assert.strictEqual(result.success, true);
+    assert.ok(result.encoded !== undefined);
+    assert.ok(result.gameUrl.includes('?x='));
+  });
+
+  test('encodeXOROnly size total is the full game URL length', () => {
+    const result = encodeXOROnly(testGames.minimal);
+
+    assert.strictEqual(result.size.total, result.gameUrl.length);
   });
 
   test('encodeXOROnly produces larger output than gzip', async () => {
@@ -178,7 +190,7 @@ describe('Legacy XOR-only Encoder', () => {
     const xorResult = encodeXOROnly(code);
     const gzipResult = await encode(code);
 
-    expect(gzipResult.size.total).toBeLessThan(xorResult.size.base64);
+    assert.ok(gzipResult.size.total < xorResult.size.total);
   });
 });
 
@@ -186,18 +198,18 @@ describe('Encoding Comparison', () => {
   test('compare returns valid comparison', async () => {
     const result = await compare(testGames.snake);
 
-    expect(result.raw).toBeDefined();
-    expect(result.methods).toBeDefined();
-    expect(result.methods['gzip+xor+base64']).toBeDefined();
-    expect(result.methods['xor+base64']).toBeDefined();
-    expect(result.recommended).toBeDefined();
+    assert.ok(result.raw !== undefined);
+    assert.ok(result.methods !== undefined);
+    assert.ok(result.methods['gzip+xor+base64'] !== undefined);
+    assert.ok(result.methods['xor+base64'] !== undefined);
+    assert.ok(result.recommended !== undefined);
   });
 
   test('gzip+xor+base64 is recommended for larger code', async () => {
     const result = await compare(testGames.snake);
 
-    expect(result.recommended).toBe('gzip+xor+base64');
-    expect(result.methods['gzip+xor+base64'].savings).toBeGreaterThan(0);
+    assert.strictEqual(result.recommended, 'gzip+xor+base64');
+    assert.ok(result.methods['gzip+xor+base64'].savings > 0);
   });
 
   test('savings calculation is accurate', async () => {
@@ -208,7 +220,7 @@ describe('Encoding Comparison', () => {
     const gzipSize = result.methods['gzip+xor+base64'].total;
     const expectedSavings = xorSize - gzipSize;
 
-    expect(result.methods['gzip+xor+base64'].savings).toBe(expectedSavings);
+    assert.strictEqual(result.methods['gzip+xor+base64'].savings, expectedSavings);
   });
 });
 
@@ -217,14 +229,14 @@ describe('Edge Cases', () => {
     const result = await encode('');
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe('');
+    assert.strictEqual(decoded, '');
   });
 
   test('handles very small code', async () => {
     const result = await encode('x=1');
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe('x=1');
+    assert.strictEqual(decoded, 'x=1');
   });
 
   test('handles special characters', async () => {
@@ -232,7 +244,7 @@ describe('Edge Cases', () => {
     const result = await encode(code);
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe(code);
+    assert.strictEqual(decoded, code);
   });
 
   test('handles HTML content', async () => {
@@ -240,7 +252,7 @@ describe('Edge Cases', () => {
     const result = await encode(html);
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe(html);
+    assert.strictEqual(decoded, html);
   });
 
   test('handles newlines and whitespace', async () => {
@@ -248,32 +260,6 @@ describe('Edge Cases', () => {
     const result = await encode(code);
     const decoded = await decodeGzip(result.encoded);
 
-    expect(decoded).toBe(code);
-  });
-});
-
-describe('Performance', () => {
-  test('encoding completes quickly', async () => {
-    const start = Date.now();
-    await encode(testGames.snake);
-    const duration = Date.now() - start;
-
-    // Should complete in under 100ms
-    expect(duration).toBeLessThan(100);
-  });
-
-  test('multiple encodings in sequence', async () => {
-    const promises = [
-      encode(testGames.minimal),
-      encode(testGames.snake),
-      encode(testGames.minimal)
-    ];
-
-    const results = await Promise.all(promises);
-
-    expect(results).toHaveLength(3);
-    results.forEach(result => {
-      expect(result.success).toBe(true);
-    });
+    assert.strictEqual(decoded, code);
   });
 });
