@@ -134,12 +134,16 @@ base64 -i game.html
 ### Using encode.js
 
 ```bash
-# Generate both traditional and XOR-encoded URLs
-node encode.js
+# Generate gzip (?z=) and legacy XOR (?x=) URLs for the built-in examples
+npm run encode
+
+# ...or for your own game file
+npm run encode -- src/games/snake.js
 
 # Output:
-# Traditional HTML encoding: https://cdn.vincentbruijn.nl/qr/img.php?q=...
-# XOR-encoded JavaScript (iOS friendly): https://cdn.vincentbruijn.nl/qr/img.php?q=...
+# src/games/snake.js:
+#   Gzip URL (1179/2953 bytes): https://cdn.vincentbruijn.nl/qr/img.php?q=...
+#   XOR URL  (2009/2953 bytes): https://cdn.vincentbruijn.nl/qr/img.php?q=...
 ```
 
 ### XOR Encoding Process
@@ -179,8 +183,8 @@ const url = `https://www.vincentbruijn.nl/qr3k/?x=${encodeURIComponent(
 ### Testing
 
 ```bash
-# Run XOR encoding/decoding tests
-node xor.test.js
+# Run XOR tests, encoder tests, and PHP<->JS parity tests
+npm test
 ```
 
 ### Available Files
@@ -221,10 +225,10 @@ _QR3K: Where the ancient game of Go meets modern web development, one QR code at
 https://cdn.vincentbruijn.nl/qr/img.php?q=<data-for-the-image-here>
 ```
 
-#### Example QR image
+#### Example game URL (gzip+xor+base64)
 
 ```
-https://www.vincentbruijn.nl/qr3k/?g=PGgxPlFSM0sgVGVzdDwvaDE+PHA+SXQgd29ya3MhPC9wPjxjYW52YXMgaWQ9ImMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIj48L2NhbnZhcz48c2NyaXB0PmNvbnN0IGM9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2MnKS5nZXRDb250ZXh0KCcyZCcpO2MuZmlsbFN0eWxlPScjMGYwJztjLmZpbGxSZWN0KDEwLDEwLDE4MCw4MCk7Yy5maWxsU3R5bGU9JyMwMDAnO2MuZm9udD0nMjBweCBtb25vc3BhY2UnO2MuZmlsbFRleHQoJ0hlbGxvIFFSM0shJywyMCw1MCk8L3NjcmlwdD4=
+https://www.vincentbruijn.nl/qr3k/?z=bvk7a3FyM2txcVbksDgwWmH0bE789d%2Bpo%2B9uentUCkPzt6DeXsJ%2FzTxCfilCqMWGFB8OYgJqDVWP62yQsMxcha62pUGarDw9ZslVGru1%2FNGhD4Jx1oYOPmDuokO0WwudN%2FwzOQl4SKQ3fDO5m4wZMSyDK2EqvprZMZEBFWxawhk%2BjiECL%2B0dAKZaZ4a97EAJSwGQLdaodDefML90DftXv2yec7ah9KPwcMhKPaHf0%2FR6JQRMRxi3GWf1rxlcYeE0t4TEpVq3q66tCJLRYMg0AwQNSJF2suUptGIya3E%3D
 ```
 
 #### Pong Game QR Code

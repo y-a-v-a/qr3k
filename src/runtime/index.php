@@ -1,4 +1,8 @@
 <?php
+// Session exists only to bypass Varnish caching; keep its cookie out of
+// script reach (games are sandboxed anyway, but defense in depth is free)
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_samesite', 'Lax');
 session_start();
 
 // Content-Security-Policy for the runtime page. The sandboxed srcdoc iframe

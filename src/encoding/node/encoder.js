@@ -9,8 +9,14 @@ const { xorWithKey } = require('../core/xor');
 // Max capacity of a QR code (version 40, binary mode, error correction L).
 // The QR code contains the FULL game URL, so that is what we measure.
 const QR_LIMIT = 2953;
-const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
-const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
+
+// Defaults; override with QR3K_RUNTIME_URL / QR3K_QR_IMAGE_URL env vars
+// (e.g. to serve games from an isolated, cookie-less origin — see docs/SECURITY.md)
+const RUNTIME_URL =
+  (process.env.QR3K_RUNTIME_URL || 'https://www.vincentbruijn.nl/qr3k/')
+    .replace(/\/*$/, '/');
+const QR_IMAGE_URL =
+  process.env.QR3K_QR_IMAGE_URL || 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
 
 /**
  * Encode game code with gzip + xor + base64

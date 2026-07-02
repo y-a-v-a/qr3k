@@ -44,7 +44,7 @@ QR3K is a constraint-based game development challenge to create complete games t
 ## Encoding Process
 1. Create game as HTML or JavaScript file
 2. Run `npm run encode` to generate encoded URLs
-3. Test both traditional and XOR-encoded versions
+3. Test both gzip (`?z=`) and legacy XOR (`?x=`) versions
 4. Generate QR code using: `https://cdn.vincentbruijn.nl/qr/img.php?q=<encoded-url>`
 5. Test on multiple devices, especially iOS Safari
 
@@ -63,19 +63,19 @@ src/
 ```
 
 ## Testing
-- **Unit tests**: `test/xor.test.js` - tests XOR encoding/decoding
+- **Unit tests**: `npm test` - runs XOR tests, encoder tests, and PHP↔JS parity tests
 - **Manual testing**: Create game → encode → test in browser
 - **Cross-platform**: Test on desktop and mobile, especially iOS Safari
 - **QR scanning**: Test actual QR code scanning on phones
 
 ## Deployment
 - **Production build**: `npm run build:prod` creates optimized Docker image
-- **Runtime URL**: `https://www.vincentbruijn.nl/qr3k/?x=<xor-encoded-content>`
-- **Traditional URL**: `https://www.vincentbruijn.nl/qr3k/?g=<base64-encoded-content>`
+- **Runtime URL (preferred)**: `https://www.vincentbruijn.nl/qr3k/?z=<gzip+xor+base64-content>`
+- **Legacy URL**: `https://www.vincentbruijn.nl/qr3k/?x=<xor+base64-content>`
 - **QR generation**: `https://cdn.vincentbruijn.nl/qr/img.php?q=<full-url>`
 
 ## Common Issues
-- **iOS Safari blocking**: Use XOR encoding (`?x=` parameter) instead of traditional base64 (`?g=`)
+- **iOS Safari blocking**: Both `?z=` and `?x=` XOR-obfuscate the payload to bypass JavaScript filtering; plain unobfuscated base64 is not supported
 - **Size limits**: Monitor byte count carefully, base64 adds ~33% overhead  
 - **Unicode handling**: XOR method works best with ASCII characters
 - **Mobile performance**: Keep animations smooth on slower devices

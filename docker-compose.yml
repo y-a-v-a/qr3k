@@ -11,5 +11,9 @@ services:
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
+      # Where generated game/QR URLs should point (see docs/SECURITY.md).
+      # Defaults to the production origin when unset.
+      - QR3K_RUNTIME_URL=${QR3K_RUNTIME_URL:-}
+      - QR3K_QR_IMAGE_URL=${QR3K_QR_IMAGE_URL:-}
     restart: unless-stopped
     container_name: qr3k-runtime

@@ -9,8 +9,27 @@ class QR3KEncoder {
     // Max capacity of a QR code (version 40, binary mode, error correction L).
     // The QR code contains the FULL game URL, so that is what we measure.
     const QR_LIMIT = 2953;
+    // Defaults; override with QR3K_RUNTIME_URL / QR3K_QR_IMAGE_URL env vars
+    // (e.g. to serve games from an isolated, cookie-less origin — see docs/SECURITY.md)
     const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
     const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
+
+    /**
+     * Base URL of the game runtime (trailing slash guaranteed)
+     * @return string
+     */
+    public static function runtimeUrl() {
+        $url = getenv('QR3K_RUNTIME_URL') ?: self::RUNTIME_URL;
+        return rtrim($url, '/') . '/';
+    }
+
+    /**
+     * QR image service URL prefix
+     * @return string
+     */
+    public static function qrImageUrl() {
+        return getenv('QR3K_QR_IMAGE_URL') ?: self::QR_IMAGE_URL;
+    }
 
     /**
      * Apply XOR cipher with repeating key.
@@ -58,8 +77,8 @@ class QR3KEncoder {
         $urlSafe = urlencode($encoded);
 
         // Generate URLs
-        $gameUrl = self::RUNTIME_URL . "?z={$urlSafe}";
-        $qrUrl = self::QR_IMAGE_URL . urlencode($gameUrl);
+        $gameUrl = self::runtimeUrl() . "?z={$urlSafe}";
+        $qrUrl = self::qrImageUrl() . urlencode($gameUrl);
 
         // Calculate sizes. The QR code encodes the full game URL, so the
         // size that matters is strlen($gameUrl) — not the base64 payload.
@@ -109,8 +128,8 @@ class QR3KEncoder {
         $encoded = base64_encode($encrypted);
         $urlSafe = urlencode($encoded);
 
-        $gameUrl = self::RUNTIME_URL . "?x={$urlSafe}";
-        $qrUrl = self::QR_IMAGE_URL . urlencode($gameUrl);
+        $gameUrl = self::runtimeUrl() . "?x={$urlSafe}";
+        $qrUrl = self::qrImageUrl() . urlencode($gameUrl);
 
         $rawSize = strlen($code);
         $encodedSize = strlen($encoded);
