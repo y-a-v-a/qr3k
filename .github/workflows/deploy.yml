@@ -25,6 +25,9 @@ jobs:
         run: |
           scp -i ~/.ssh/deploy_key -r src/runtime/* \
             ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}
+          # api.php requires the encoding library (../encoding or ./encoding relative to the web root)
+          scp -i ~/.ssh/deploy_key -r src/encoding \
+            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}/encoding
 
       - name: Cleanup
         if: always()

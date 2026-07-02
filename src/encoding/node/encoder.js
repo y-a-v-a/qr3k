@@ -6,6 +6,12 @@
 const zlib = require('zlib');
 const { xorWithKey } = require('../core/xor');
 
+// Max capacity of a QR code (version 40, binary mode, error correction L).
+// The QR code contains the FULL game URL, so that is what we measure.
+const QR_LIMIT = 2953;
+const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
+const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
+
 /**
  * Encode game code with gzip + xor + base64
  * @param {string} code - Game code (HTML or JavaScript)
@@ -24,7 +30,7 @@ async function encode(code, options = {}) {
     });
   });
 
-  // Step 2: XOR encrypt
+  // Step 2: XOR obfuscate
   const encrypted = xorWithKey(compressed);
 
   // Step 3: Base64 encode
@@ -33,24 +39,17 @@ async function encode(code, options = {}) {
   // Step 4: URL encode for QR
   const urlSafe = encodeURIComponent(encoded);
 
-  // Calculate sizes
+  // Generate URLs
+  const gameUrl = `${RUNTIME_URL}?z=${urlSafe}`;
+  const qrUrl = `${QR_IMAGE_URL}${encodeURIComponent(gameUrl)}`;
+
+  // Calculate sizes. The QR code encodes the full game URL, so the size
+  // that matters is gameUrl.length — not the base64 payload.
   const rawSize = Buffer.byteLength(code, 'utf8');
   const compressedSize = compressed.length;
-  const encryptedSize = encrypted.length; // Same as compressed
   const encodedSize = encoded.length;
-  const urlSize = urlSafe.length;
-
-  // Estimate with decoder overhead
-  const DECODER_SIZE = 180; // Approximate minified decoder size
-  const totalSize = encodedSize + DECODER_SIZE;
-
-  // Check limits
-  const QR_LIMIT = 2953;
+  const totalSize = gameUrl.length;
   const isOverLimit = totalSize > QR_LIMIT;
-
-  // Generate URLs
-  const gameUrl = `https://www.vincentbruijn.nl/qr3k/?z=${urlSafe}`;
-  const qrUrl = `https://cdn.vincentbruijn.nl/qr/img.php?q=${encodeURIComponent(gameUrl)}`;
 
   return {
     success: true,
@@ -60,15 +59,15 @@ async function encode(code, options = {}) {
     size: {
       raw: rawSize,
       compressed: compressedSize,
-      encrypted: encryptedSize,
       base64: encodedSize,
-      url: urlSize,
-      decoder: DECODER_SIZE,
+      url: urlSafe.length,
       total: totalSize,
       limit: QR_LIMIT,
       isOverLimit,
       remaining: QR_LIMIT - totalSize,
-      compressionRatio: ((1 - compressedSize / rawSize) * 100).toFixed(1) + '%',
+      compressionRatio: rawSize > 0
+        ? ((1 - compressedSize / rawSize) * 100).toFixed(1) + '%'
+        : '0%',
       savings: rawSize - compressedSize
     },
     metadata: {
@@ -85,18 +84,17 @@ async function encode(code, options = {}) {
  * @returns {object} Encoding result
  */
 function encodeXOROnly(code) {
-  const { xorWithKey } = require('../core/xor');
-
   // XOR + Base64 (legacy method)
   const encrypted = xorWithKey(Buffer.from(code, 'utf8'));
   const encoded = encrypted.toString('base64');
   const urlSafe = encodeURIComponent(encoded);
 
+  const gameUrl = `${RUNTIME_URL}?x=${urlSafe}`;
+  const qrUrl = `${QR_IMAGE_URL}${encodeURIComponent(gameUrl)}`;
+
   const rawSize = Buffer.byteLength(code, 'utf8');
   const encodedSize = encoded.length;
-
-  const gameUrl = `https://www.vincentbruijn.nl/qr3k/?x=${urlSafe}`;
-  const qrUrl = `https://cdn.vincentbruijn.nl/qr/img.php?q=${encodeURIComponent(gameUrl)}`;
+  const totalSize = gameUrl.length;
 
   return {
     success: true,
@@ -106,9 +104,11 @@ function encodeXOROnly(code) {
     size: {
       raw: rawSize,
       base64: encodedSize,
-      limit: 2953,
-      isOverLimit: encodedSize > 2953,
-      remaining: 2953 - encodedSize
+      url: urlSafe.length,
+      total: totalSize,
+      limit: QR_LIMIT,
+      isOverLimit: totalSize > QR_LIMIT,
+      remaining: QR_LIMIT - totalSize
     },
     metadata: {
       method: 'xor+base64',
@@ -126,21 +126,24 @@ async function compare(code) {
   const gzipResult = await encode(code);
   const xorResult = encodeXOROnly(code);
 
+  const gzipTotal = gzipResult.size.total;
+  const xorTotal = xorResult.size.total;
+
   return {
     raw: Buffer.byteLength(code, 'utf8'),
     methods: {
       'gzip+xor+base64': {
-        total: gzipResult.size.total,
-        savings: xorResult.size.base64 - gzipResult.size.total,
-        improvement: (((xorResult.size.base64 - gzipResult.size.total) / xorResult.size.base64) * 100).toFixed(1) + '%'
+        total: gzipTotal,
+        savings: xorTotal - gzipTotal,
+        improvement: (((xorTotal - gzipTotal) / xorTotal) * 100).toFixed(1) + '%'
       },
       'xor+base64': {
-        total: xorResult.size.base64,
+        total: xorTotal,
         savings: 0,
         improvement: '0%'
       }
     },
-    recommended: gzipResult.size.total < xorResult.size.base64 ? 'gzip+xor+base64' : 'xor+base64'
+    recommended: gzipTotal < xorTotal ? 'gzip+xor+base64' : 'xor+base64'
   };
 }
 

@@ -4,7 +4,7 @@
   "description": "A challenge to create complete games that fit entirely within a QR code's data capacity",
   "main": "src/runtime/index.php",
   "scripts": {
-    "test": "node test/xor.test.js",
+    "test": "node test/xor.test.js && node --test 'test/encoding/*.test.js'",
     "encode": "node src/tools/encode.js",
     "dev": "docker compose up --build",
     "dev:detached": "docker compose up -d --build",
@@ -29,7 +29,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/qr3k.git"
+    "url": "https://github.com/y-a-v-a/qr3k.git"
   },
   "engines": {
     "node": ">=14.0.0",

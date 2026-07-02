@@ -230,14 +230,16 @@ ctx.fillText('Hello QR3K!', 80, 110);
             const xorSize = result.xor.size.totalBytes;
             const gzipSize = result.gzip.size.totalBytes;
             const saved = xorSize - gzipSize;
+            // compressionRatio = encoded-URL bytes per raw byte (e.g. 0.45)
             const ratio = result.gzip.size.compressionRatio;
-            const percentLarger = Math.round((1 / ratio - 1) * 100);
+            const shrinkFactor = 1 / ratio;
+            const percentLarger = Math.round((shrinkFactor - 1) * 100);
 
             document.getElementById('rawSize').textContent = `${rawSize} bytes`;
             document.getElementById('xorSize').textContent = `${xorSize} bytes (${result.xor.size.base64Bytes} base64)`;
             document.getElementById('gzipSize').textContent = `${gzipSize} bytes (${result.gzip.size.base64Bytes} base64)`;
             document.getElementById('bytesSaved').innerHTML = `<strong style="color: var(--yellow)">${saved} bytes (${Math.round((saved / xorSize) * 100)}%)</strong>`;
-            document.getElementById('compressionRatio').textContent = `${ratio.toFixed(2)}x smaller`;
+            document.getElementById('compressionRatio').textContent = `${shrinkFactor.toFixed(2)}x smaller`;
             document.getElementById('percentLarger').innerHTML = `<strong style="color: var(--yellow)">${percentLarger}%</strong>`;
         }
 

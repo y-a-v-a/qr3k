@@ -63,24 +63,15 @@ isHtmlContent('<canvas></canvas>'); // true
 isHtmlContent('const x = 42;');     // false
 ```
 
-### `executeContent(content)`
+### Game execution
 
-Executes content based on its detected type (HTML or JavaScript).
+Decoded games are executed by the runtime page (`index.php`), not by
+`xor.js`. The runtime places the decoded content inside a sandboxed
+`<iframe sandbox="allow-scripts">` with an opaque origin: games get full
+canvas, keyboard and touch access, but no cookies, no same-origin DOM
+access, and (via the page's Content-Security-Policy) no network access.
 
-**Parameters:**
-- `content` (string): Decoded content to execute
-
-**Behavior:**
-- **HTML Content**: Injects into DOM container, manually executes `<script>` tags
-- **JavaScript Content**: Executes directly using `eval()`
-
-**Example:**
-```javascript
-const { executeContent } = require('./xor.js');
-executeContent('<canvas id="c"></canvas><script>/* game code */</script>');
-```
-
-## XOR Encryption Details
+## XOR Obfuscation Details
 
 ### Key
 - **Key String**: `"qr3k"` 
