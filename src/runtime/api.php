@@ -57,34 +57,7 @@ const MAX_BODY_BYTES = 65536;
 const RATE_LIMIT_REQUESTS = 30;   // per window, per IP
 const RATE_LIMIT_WINDOW = 60;     // seconds
 
-/**
- * Small file-based per-IP rate limiter. Playful project, boring throttle.
- * @return bool true if the request is allowed
- */
-function rateLimitAllows() {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $file = sys_get_temp_dir() . '/qr3k-ratelimit-' . hash('sha256', $ip);
-    $now = time();
-
-    $timestamps = [];
-    if (is_file($file)) {
-        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-        foreach ($lines as $line) {
-            $t = (int) $line;
-            if ($t > $now - RATE_LIMIT_WINDOW) {
-                $timestamps[] = $t;
-            }
-        }
-    }
-
-    if (count($timestamps) >= RATE_LIMIT_REQUESTS) {
-        return false;
-    }
-
-    $timestamps[] = $now;
-    @file_put_contents($file, implode("\n", $timestamps), LOCK_EX);
-    return true;
-}
+require_once __DIR__ . '/ratelimit.php';
 
 function respond($statusCode, $payload) {
     http_response_code($statusCode);
@@ -114,7 +87,7 @@ if (!class_exists('QR3KEncoder')) {
     ]);
 }
 
-if (!rateLimitAllows()) {
+if (!qr3kRateLimitAllows('api', RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW)) {
     header('Retry-After: ' . RATE_LIMIT_WINDOW);
     respond(429, [
         'success' => false,
