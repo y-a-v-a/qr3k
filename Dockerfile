@@ -1,10 +1,12 @@
 # QR3K Runtime Container
 FROM php:8.2-apache as base
 
-# Install system dependencies
+# Install system dependencies (libpng enables GD for PNG QR code output)
 RUN apt-get update && apt-get install -y \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    libpng-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install gd
 
 # Enable Apache modules (sessions and zlib are built into the official PHP image)
 RUN a2enmod rewrite headers expires

@@ -2,7 +2,8 @@ services:
   qr3k:
     build: .
     ports:
-      - "8080:80"
+      # 8080 is taken by another local project; the container has been running on 8081
+      - "8081:80"
     volumes:
       # Mount src/runtime for live development
       - ./src/runtime:/var/www/html
