@@ -493,6 +493,73 @@ body.game-runtime .site-nav__brand {
     color: var(--magenta);
 }
 
+/* History section */
+.about-history {
+    max-width: 900px;
+    margin: 40px 0 30px;
+    padding: 35px 40px;
+    background: var(--bg-card);
+    border: 4px solid var(--yellow);
+    box-shadow: 8px 8px 0 var(--blue);
+}
+
+.about-history h2 {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--yellow);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 15px;
+}
+
+.about-history > p {
+    font-size: 16px;
+    color: var(--text-light);
+    line-height: 1.7;
+    margin: 0 0 25px;
+}
+
+.history-timeline {
+    list-style: none;
+}
+
+.history-timeline li {
+    display: flex;
+    gap: 20px;
+    padding: 14px 0;
+    border-top: 2px dashed #333;
+}
+
+.history-timeline li:first-child {
+    border-top: none;
+}
+
+.history-year {
+    flex: 0 0 70px;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--magenta);
+    letter-spacing: 1px;
+}
+
+.history-entry {
+    font-size: 15px;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.history-entry a {
+    color: var(--blue);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+.history-entry a:hover {
+    color: var(--yellow);
+}
+
 /* CTA section */
 .about-cta {
     max-width: 900px;
@@ -736,6 +803,15 @@ body.game-runtime .site-nav__brand {
 
     .stat-card__value {
         font-size: 42px;
+    }
+
+    .about-history {
+        padding: 25px 20px;
+    }
+
+    .history-timeline li {
+        flex-direction: column;
+        gap: 4px;
     }
 
     .about-cta {
