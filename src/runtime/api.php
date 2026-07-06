@@ -15,7 +15,7 @@
  * {
  *   "success": true,
  *   "gameUrl": "https://www.vincentbruijn.nl/qr3k/?z=...",
- *   "qrUrl": "https://cdn.vincentbruijn.nl/qr/img.php?q=...",
+ *   "qrUrl": "qr.php?d=...",  // self-hosted, relative to this runtime
  *   "size": {
  *     "raw": 1234,
  *     "compressed": 750,

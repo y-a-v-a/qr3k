@@ -69,7 +69,7 @@ Download QR code image from URL:
 {
   "success": true,
   "gameUrl": "https://www.vincentbruijn.nl/qr3k/?x=...",
-  "qrUrl": "https://cdn.vincentbruijn.nl/qr/img.php?q=...",
+  "qrUrl": "qr.php?d=...",
   "size": {
     "bytes": 1234,
     "base64Bytes": 1646,

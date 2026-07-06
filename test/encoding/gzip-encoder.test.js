@@ -164,7 +164,7 @@ describe('Gzip+XOR+Base64 Encoder', () => {
   test('qrUrl is properly formatted', async () => {
     const result = await encode(testGames.minimal);
 
-    assert.ok(result.qrUrl.includes('cdn.vincentbruijn.nl/qr/img.php?q='));
+    assert.ok(result.qrUrl.includes('www.vincentbruijn.nl/qr3k/qr.php?d='));
     assert.ok(result.qrUrl.includes(encodeURIComponent('https://')));
   });
 });

@@ -138,8 +138,8 @@ base64 -i game.html
 node encode.js
 
 # Output:
-# Traditional HTML encoding: https://cdn.vincentbruijn.nl/qr/img.php?q=...
-# XOR-encoded JavaScript (iOS friendly): https://cdn.vincentbruijn.nl/qr/img.php?q=...
+# Traditional HTML encoding: https://www.vincentbruijn.nl/qr3k/qr.php?d=...
+# XOR-encoded JavaScript (iOS friendly): https://www.vincentbruijn.nl/qr3k/qr.php?d=...
 ```
 
 ### XOR Encoding Process
@@ -217,9 +217,16 @@ _QR3K: Where the ancient game of Go meets modern web development, one QR code at
 
 ## Base URL for getting a QR image
 
+QR images are rendered by the runtime itself (`qr.php`, powered by a vendored
+[chillerlan/php-qrcode](https://github.com/chillerlan/php-qrcode) — no Composer needed):
+
 ```
-https://cdn.vincentbruijn.nl/qr/img.php?q=<data-for-the-image-here>
+https://www.vincentbruijn.nl/qr3k/qr.php?d=<game-url-here>
 ```
+
+Optional parameters: `format=svg|png` (default `svg`), `fg=RRGGBB` and
+`bg=RRGGBB` for colors (default: black on yellow). The endpoint only renders
+QR3K game URLs and rejects color combinations with too little contrast to scan.
 
 #### Example QR image
 

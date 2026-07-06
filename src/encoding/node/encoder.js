@@ -10,7 +10,8 @@ const { xorWithKey } = require('../core/xor');
 // The QR code contains the FULL game URL, so that is what we measure.
 const QR_LIMIT = 2953;
 const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
-const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
+// Self-hosted QR endpoint next to the runtime (see src/runtime/qr.php)
+const QR_IMAGE_URL = `${RUNTIME_URL}qr.php?d=`;
 
 /**
  * Encode game code with gzip + xor + base64

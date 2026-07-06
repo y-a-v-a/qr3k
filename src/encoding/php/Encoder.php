@@ -10,7 +10,10 @@ class QR3KEncoder {
     // The QR code contains the FULL game URL, so that is what we measure.
     const QR_LIMIT = 2953;
     const RUNTIME_URL = 'https://www.vincentbruijn.nl/qr3k/';
-    const QR_IMAGE_URL = 'https://cdn.vincentbruijn.nl/qr/img.php?q=';
+    // Self-hosted QR endpoint (qr.php), relative so it works on localhost
+    // during development and in production alike. The encoded game URL is
+    // always the production RUNTIME_URL either way.
+    const QR_IMAGE_URL = 'qr.php?d=';
 
     /**
      * Apply XOR cipher with repeating key.

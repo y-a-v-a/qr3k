@@ -45,7 +45,7 @@ QR3K is a constraint-based game development challenge to create complete games t
 1. Create game as HTML or JavaScript file
 2. Run `npm run encode` to generate encoded URLs
 3. Test both traditional and XOR-encoded versions
-4. Generate QR code using: `https://cdn.vincentbruijn.nl/qr/img.php?q=<encoded-url>`
+4. Generate QR code using the self-hosted endpoint: `qr.php?d=<encoded-url>` (supports `format=svg|png`, `fg`/`bg` hex colors)
 5. Test on multiple devices, especially iOS Safari
 
 ## File Structure
@@ -72,7 +72,7 @@ src/
 - **Production build**: `npm run build:prod` creates optimized Docker image
 - **Runtime URL**: `https://www.vincentbruijn.nl/qr3k/?x=<xor-encoded-content>`
 - **Traditional URL**: `https://www.vincentbruijn.nl/qr3k/?g=<base64-encoded-content>`
-- **QR generation**: `https://cdn.vincentbruijn.nl/qr/img.php?q=<full-url>`
+- **QR generation**: `https://www.vincentbruijn.nl/qr3k/qr.php?d=<full-url>` (self-hosted, vendored chillerlan/php-qrcode — no Composer)
 
 ## Common Issues
 - **iOS Safari blocking**: Use XOR encoding (`?x=` parameter) instead of traditional base64 (`?g=`)
