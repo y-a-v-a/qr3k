@@ -553,30 +553,30 @@ body.game-runtime .site-nav__brand {
 }
 
 /* About footer */
-.about-footer {
+.site-footer {
     max-width: 900px;
     margin-top: 50px;
     padding: 20px 0;
     text-align: center;
 }
 
-.about-footer p {
+.site-footer p {
     font-size: 13px;
     color: #666;
     margin: 0 0 15px 0;
     line-height: 1.6;
 }
 
-.about-footer a {
+.site-footer a {
     color: var(--blue);
     text-decoration: none;
 }
 
-.about-footer a:hover {
+.site-footer a:hover {
     color: var(--yellow);
 }
 
-.about-footer__logo {
+.site-footer__logo {
     font-size: 20px;
     font-weight: 900;
     color: #444;

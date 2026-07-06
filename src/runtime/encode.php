@@ -108,6 +108,8 @@ ctx.fillText('Hello QR3K!', 80, 110);
         <img id="qrImage" alt="QR Code">
     </div>
 
+    <?php include __DIR__ . '/footer.php'; ?>
+
     <script>
         // Update character counter
         function updateCounter() {

@@ -59,11 +59,7 @@
         </div>
     </div>
 
-    <div class="about-footer">
-        <p>QR3K is an experiment in creative constraint.<br>
-        Built by <a href="https://vincentbruijn.nl">vincentbruijn.nl</a></p>
-        <div class="about-footer__logo">QR3K</div>
-    </div>
+    <?php include __DIR__ . '/footer.php'; ?>
 
 </body>
 </html>
