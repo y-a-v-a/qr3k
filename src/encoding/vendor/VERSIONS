@@ -3,11 +3,11 @@ Vendored libraries (installed without Composer — see autoload.php)
 chillerlan/php-qrcode 5.0.3
   https://github.com/chillerlan/php-qrcode/archive/refs/tags/5.0.3.tar.gz
   Copied: src/ (minus Decoder/ and Detector/ — the QR *reader*, unused here),
-  LICENSE-MIT, LICENSE-ASL-2.0, NOTICE
+  LICENSE files, NOTICE (if present)
 
 chillerlan/php-settings-container 3.2.1
   https://github.com/chillerlan/php-settings-container/archive/refs/tags/3.2.1.tar.gz
   Copied: src/, LICENSE
 
-To upgrade: download the new release tag, replace the src/ directory,
-apply the same pruning, and update this file.
+To upgrade: .claude/skills/upgrade-qr-vendor/scripts/upgrade.sh <tag> [settings-tag]
+Then validate: .claude/skills/upgrade-qr-vendor/scripts/verify.sh
