@@ -260,17 +260,17 @@ body.game-runtime {
     font-family: monospace;
 }
 
-.game-overlay {
+/* Compact overlay variant of the shared nav on the game runtime:
+   stays out of the way of the game, brightens on hover. */
+body.game-runtime .site-nav {
     position: fixed;
     top: 8px;
     left: 8px;
     z-index: 9999;
+    gap: 10px;
+    margin: 0;
     font-size: 11px;
-    font-weight: 700;
     font-family: monospace;
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--yellow);
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 4px 8px;
@@ -279,8 +279,14 @@ body.game-runtime {
     pointer-events: auto;
 }
 
-.game-overlay:hover {
+body.game-runtime .site-nav:hover {
     opacity: 1;
+}
+
+body.game-runtime .site-nav__brand {
+    background: none;
+    color: var(--yellow);
+    padding: 0;
 }
 
 #container {
@@ -294,20 +300,39 @@ body.game-runtime {
 
 /* About page specific styles */
 
-.about-nav {
-    display: inline-block;
-    color: var(--blue);
+/* Shared site navigation */
+
+.site-nav {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 30px;
     font-size: 14px;
     font-weight: 700;
-    text-decoration: none;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 30px;
+}
+
+.site-nav__brand {
+    font-weight: 900;
+    background: var(--magenta);
+    color: var(--text-dark);
+    padding: 2px 8px;
+}
+
+.site-nav__link {
+    color: var(--blue);
+    text-decoration: none;
     transition: color 0.1s ease;
 }
 
-.about-nav:hover {
+.site-nav__link:hover {
     color: var(--yellow);
+}
+
+.site-nav__link--active {
+    color: var(--yellow);
+    border-bottom: 2px solid var(--yellow);
 }
 
 .about-header {

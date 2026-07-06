@@ -11,6 +11,8 @@ session_start();
     <script src="xor.js"></script>
 </head>
 <body>
+    <?php include __DIR__ . '/nav.php'; ?>
+
     <h1>QR3K Encoder</h1>
     <p>Paste your game code below (HTML or JavaScript) and generate a QR-compatible URL. New: Gzip compression saves 33-45%!</p>
     

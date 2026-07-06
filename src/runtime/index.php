@@ -25,7 +25,7 @@ header(
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="game-runtime">
-    <a href="about.php" class="game-overlay">QR3K</a>
+    <?php include __DIR__ . '/nav.php'; ?>
     <div id="container"></div>
     <div id="error" style="display: none">
       No game data found. Add ?z=gzip-encoded-data or ?x=xor-encoded-data to URL

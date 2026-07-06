@@ -9,7 +9,7 @@
 </head>
 <body>
 
-    <a href="encode.php" class="about-nav">&larr; Back to Encoder</a>
+    <?php include __DIR__ . '/nav.php'; ?>
 
     <div class="about-header">
         <h1 class="about-logo">QR3K</h1>
