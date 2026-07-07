@@ -27,6 +27,7 @@ FROM base as production
 # Copy runtime files for production
 COPY src/runtime/ /var/www/html/
 COPY src/encoding/ /var/www/encoding/
+COPY src/games/ /var/www/games/
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html && \

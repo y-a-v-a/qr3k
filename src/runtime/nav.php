@@ -5,6 +5,7 @@ $navCurrent = basename($_SERVER['SCRIPT_NAME']);
 $navPages = [
     'index.php' => 'Play',
     'encode.php' => 'Encoder',
+    'examples.php' => 'Examples',
     'about.php' => 'About',
 ];
 ?>

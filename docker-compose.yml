@@ -9,6 +9,8 @@ services:
       - ./src/runtime:/var/www/html
       # Mount encoding library for API access
       - ./src/encoding:/var/www/encoding
+      # Mount example games so examples.php can encode them
+      - ./src/games:/var/www/games
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data
