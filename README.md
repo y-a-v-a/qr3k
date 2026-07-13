@@ -131,15 +131,18 @@ base64 -i game.html
 # 5. Test by scanning the QR code
 ```
 
-### Using encode.js
+### Using the encoder
 
 ```bash
-# Generate both traditional and XOR-encoded URLs
-node encode.js
+# Generate gzip (?z=) and legacy XOR (?x=) URLs for the built-in examples
+npm run encode
 
-# Output:
-# Traditional HTML encoding: https://www.vincentbruijn.nl/qr3k/qr.php?d=...
-# XOR-encoded JavaScript (iOS friendly): https://www.vincentbruijn.nl/qr3k/qr.php?d=...
+# ...or for your own game file
+npm run encode -- src/games/breakout.js
+
+# Output (per game):
+#   Gzip URL (375/2953 bytes): https://www.vincentbruijn.nl/qr3k/qr.php?d=...
+#   XOR URL  (439/2953 bytes): https://www.vincentbruijn.nl/qr3k/qr.php?d=...
 ```
 
 ### XOR Encoding Process
@@ -179,8 +182,8 @@ const url = `https://www.vincentbruijn.nl/qr3k/?x=${encodeURIComponent(
 ### Testing
 
 ```bash
-# Run XOR encoding/decoding tests
-node xor.test.js
+# Run XOR, gzip-encoder, and PHP<->JS parity tests
+npm test
 ```
 
 ### Available Files
@@ -192,7 +195,7 @@ node xor.test.js
 
 ## Technical Limitations
 
-- **iOS Safari**: Use XOR encoding (`?x=`) to bypass JavaScript filtering
+- **iOS Safari**: `?z=` and `?x=` both XOR-obfuscate the payload to bypass JavaScript filtering
 - **Base64 overhead**: ~33% size increase from encoding
 - **URL length limits**: Some systems have URL length restrictions
 - **Mobile performance**: Keep animations smooth on slower devices
@@ -231,7 +234,7 @@ QR3K game URLs and rejects color combinations with too little contrast to scan.
 #### Example QR image
 
 ```
-https://www.vincentbruijn.nl/qr3k/?g=PGgxPlFSM0sgVGVzdDwvaDE+PHA+SXQgd29ya3MhPC9wPjxjYW52YXMgaWQ9ImMiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTAwIj48L2NhbnZhcz48c2NyaXB0PmNvbnN0IGM9ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2MnKS5nZXRDb250ZXh0KCcyZCcpO2MuZmlsbFN0eWxlPScjMGYwJztjLmZpbGxSZWN0KDEwLDEwLDE4MCw4MCk7Yy5maWxsU3R5bGU9JyMwMDAnO2MuZm9udD0nMjBweCBtb25vc3BhY2UnO2MuZmlsbFRleHQoJ0hlbGxvIFFSM0shJywyMCw1MCk8L3NjcmlwdD4=
+https://www.vincentbruijn.nl/qr3k/qr.php?d=https%3A%2F%2Fwww.vincentbruijn.nl%2Fqr3k%2F%3Fz%3Dbvk7a3FyM2txcV77sDzwW2E23JL73wpT5NhViC9YUpBxMGNqdjhNS8Ov9UnA30nKnK0Q%252FLP78CHSo%252F0wvLiSvh6p5lgFXKAH9yT4z0Z29BOJugCyVV9%252BdM%252BIP7VbFCt3zNdy2mRQsKqIj3PheDaVDoLBm0Dov%252FJMo%252Be6SmJqYwvSi6830ZfturKauddKHV%252BmfO0khE90QUzby4MXDymqjr%252F90FDsNTRhiX%252Fd%252B47IaAzZHEJqFLaJ40SMpKoaVDVB97JH6Vj0qzgerizFyu5OgS8t05n2tU0ZQswzOrEfMqCXqNRwURkWqF1zM2s%253D
 ```
 
 #### Pong Game QR Code
